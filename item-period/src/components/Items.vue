@@ -8,6 +8,7 @@
       class="elevation-1"
       item-key="id"
       show-select
+      v-model="selected"
       v-bind:loading="isLoading"
       loading-text="Загрузка... Пожалуйста, подождите"
     ></v-data-table>
@@ -50,8 +51,8 @@
         </v-card>
       </v-dialog>
       <v-spacer></v-spacer>
-      <v-btn color="red" dark> Удалить </v-btn>
-      <v-btn color="green" dark> Сохранить </v-btn>
+      <v-btn color="red" @click="deleteItems" dark> Удалить </v-btn>
+      <v-btn color="green" @click="save" dark> Сохранить </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -83,15 +84,20 @@ export default {
         this.editedIndex = -1;
       });
     },
+    async deleteItems(){
+      for (let item of this.selected){
+        await ItemsService.deleteItem(item.id);
+      }
+      await this.initialize();
+    },
     async save() {
-      // Object.assign(this.items[this.editedIndex], this.editedItem);
       await ItemsService.addItem(this.editedItem.name, this.editedItem.description);
       await this.initialize();
-
       this.close();
     },
   },
   data: () => ({
+    selected:[],
     dialog: false,
     isLoading: true,
     editedItem: {

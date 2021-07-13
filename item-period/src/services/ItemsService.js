@@ -7,7 +7,7 @@ export default {
             .then((items) =>
                 items
             ),
-    addItem: async (name, description) =>
+    addItem: async (name, description) => {
         await fetch(config.items, {
             method: "POST",
             headers: {
@@ -17,7 +17,18 @@ export default {
         }).then((res) => res.text())
             .then((status) =>
                 status
-            ),
-    deleteItem: async () => { },
-    deleteItems: async () => { }
+            )
+    },
+    deleteItem: async (id) => {
+        await fetch(config.items, {
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ "id": id })
+        }).then((res) => res.text())
+            .then((status) =>
+                status
+            )
+    }
 }
