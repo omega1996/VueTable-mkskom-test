@@ -11,7 +11,47 @@
       v-model="selected"
       v-bind:loading="isLoading"
       loading-text="Загрузка... Пожалуйста, подождите"
-    ></v-data-table>
+    >
+      <template v-slot:item.name="props">
+        <v-edit-dialog
+          :return-value.sync="props.item.name"
+          @save="saveInput"
+          @cancel="cancelInput"
+          @open="openInput"
+          @close="closeInput"
+        >
+          {{ props.item.name }}
+          <template v-slot:input>
+            <v-text-field
+              v-model="props.item.name"
+              label="Edit"
+              single-line
+              counter
+            ></v-text-field>
+          </template>
+        </v-edit-dialog>
+      </template>
+      <template v-slot:item.description="props">
+        <v-edit-dialog
+          :return-value.sync="props.item.description"
+          @save="saveInput"
+          @cancel="cancelInput"
+          @open="openInput"
+          @close="closeInput"
+        >
+          {{ props.item.description }}
+          <template v-slot:input>
+            <v-text-field
+              v-model="props.item.description"
+              label="Edit"
+              single-line
+              counter
+            ></v-text-field>
+          </template>
+        </v-edit-dialog>
+      </template>
+    </v-data-table>
+
     <v-card-actions>
       <v-dialog v-model="dialog" max-width="500px">
         <template v-slot:activator="{ on, attrs }">
@@ -52,7 +92,7 @@
       </v-dialog>
       <v-spacer></v-spacer>
       <v-btn color="red" @click="deleteItems" dark> Удалить </v-btn>
-      <v-btn color="green" @click="save" dark> Сохранить </v-btn>
+      <v-btn color="success" @click="saveAll" :disabled="canSave" > Сохранить </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -84,20 +124,41 @@ export default {
         this.editedIndex = -1;
       });
     },
-    async deleteItems(){
-      for (let item of this.selected){
+    async deleteItems() {
+      for (let item of this.selected) {
         await ItemsService.deleteItem(item.id);
       }
       await this.initialize();
     },
+    openInput(){
+    },
+    cancelInput(){
+    },
+    saveInput(){
+      this.canSave=false;
+    },
+    closeInput(){
+    },
     async save() {
-      await ItemsService.addItem(this.editedItem.name, this.editedItem.description);
+      await ItemsService.addItem(
+        this.editedItem.name,
+        this.editedItem.description
+      );
       await this.initialize();
       this.close();
     },
+    async saveAll() {
+
+      for (let item of this.items){
+        await ItemsService.updateItem(item)
+      }
+      await this.initialize();
+      this.canSave = true
+    },
   },
   data: () => ({
-    selected:[],
+    canSave: true,
+    selected: [],
     dialog: false,
     isLoading: true,
     editedItem: {

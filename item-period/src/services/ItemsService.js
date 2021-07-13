@@ -30,5 +30,18 @@ export default {
             .then((status) =>
                 status
             )
+    },
+    updateItem: async(item)=>{
+
+        await fetch(config.items, {
+            method: "PATCH",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ "id": item.id,"name": item.name, "description":item.description })
+        }).then((res) => res.text())
+            .then((status) =>
+                status
+            )
     }
 }
