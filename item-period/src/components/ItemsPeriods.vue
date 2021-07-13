@@ -4,7 +4,8 @@
 
 <script>
     export default {
-        name: "ItemsPeriods"
+        name: "ItemsPeriods",
+
     }
 </script>
 

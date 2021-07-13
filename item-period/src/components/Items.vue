@@ -57,6 +57,8 @@
 </template>
 
 <script>
+import ItemsService from "../services/ItemsService";
+
 export default {
   name: "Items",
   created() {
@@ -70,29 +72,9 @@ export default {
   },
   methods: {
     async initialize() {
-      await fetch("http://localhost:3000/items", {
-
-      })
-        .then((res) => res.json())
-        .then((items) => console.log(items));
-      this.items = [
-        {
-          id: 1,
-          name: "hello",
-          description: "world",
-        },
-        {
-          id: 2,
-          name: "not-hello",
-          description: "world",
-        },
-        {
-          id: 3,
-          name: "hello",
-          description: "world",
-        },
-      ];
-      this.isLoading = false;
+      await ItemsService.getItems().then((items) => {
+        (this.items = items), (this.isLoading = false);
+      });
     },
     close() {
       this.dialog = false;
@@ -103,9 +85,9 @@ export default {
     },
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        Object.assign(this.items[this.editedIndex], this.editedItem);
       } else {
-        this.desserts.push(this.editedItem);
+        this.items.push(this.editedItem);
       }
       this.close();
     },
@@ -114,18 +96,14 @@ export default {
     dialog: false,
     isLoading: true,
     editedItem: {
+      id: 0,
       name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
+      description: "",
     },
     defaultItem: {
+      id: 0,
       name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
+      description: "",
     },
     headers: [
       {
