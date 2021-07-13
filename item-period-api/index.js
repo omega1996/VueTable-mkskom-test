@@ -1,10 +1,13 @@
 import express from "express";
 import sqlite3 from "sqlite3";
 import * as path from 'path';
+import cors from 'cors';
 const sqlite = sqlite3.verbose();
 const app = express();
 
 const __dirname = 'C:\\Users\\Omega\\WebstormProjects\\VueTable-mkskom-test\\item-period-api'
+app.use(cors());
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
@@ -22,15 +25,12 @@ app.listen(3000, () => { {
     console.log("Server started (http://localhost:3000/) !");
 }});
 
-app.get("/", (req, res) => { {
-    res.send ("Hello world...");
-}});
-
 app.post('/', function (req, res) {
     res.send(req.body)
   })
 
 app.get("/items", (req,res)=>{
+  
     const sql = "SELECT * FROM Item;"
     db.all(sql, [], (err, rows) => {
         if (err) {
