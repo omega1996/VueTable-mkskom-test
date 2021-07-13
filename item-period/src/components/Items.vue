@@ -83,12 +83,11 @@ export default {
         this.editedIndex = -1;
       });
     },
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.items[this.editedIndex], this.editedItem);
-      } else {
-        this.items.push(this.editedItem);
-      }
+    async save() {
+      // Object.assign(this.items[this.editedIndex], this.editedItem);
+      await ItemsService.addItem(this.editedItem.name, this.editedItem.description);
+      await this.initialize();
+
       this.close();
     },
   },
@@ -96,7 +95,6 @@ export default {
     dialog: false,
     isLoading: true,
     editedItem: {
-      id: 0,
       name: "",
       description: "",
     },
