@@ -14,104 +14,136 @@ app.use(express.urlencoded({ extended: true }))
 const db_name = path.join(__dirname, "data", "apptest.db");
 const db = new sqlite.Database(db_name, err => {
   if (err) {
-      console.log(db_name);
+    console.log(db_name);
     return console.error(err.message);
   }
-  
+
   console.log("Successful connection to the database 'apptest.db'");
 });
 
-app.listen(3000, () => { {
+app.listen(3000, () => {
+  {
     console.log("Server started (http://localhost:3000/) !");
-}});
+  }
+});
 
 app.post('/', function (req, res) {
-    res.send(req.body)
-  })
+  res.send(req.body)
+})
 
-app.get("/items", (req,res)=>{
-  
-    const sql = "SELECT * FROM Item;"
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-          return res.send(err.message);
-        }
-        res.send(rows)
-      });
+app.get("/items", (req, res) => {
+
+  const sql = "SELECT * FROM Item;"
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      return res.send(err.message);
+    }
+    res.send(rows)
+  });
 })
 
 app.post("/items", (req, res) => {
-    const sql = "INSERT INTO Item (name, description) VALUES (?, ?)"
-    const item = [req.body.name, req.body.description]
-    db.run(sql, item, err=>{
-        if (err) {
-            return res.send(err.message);
-          }
-        res.send("ok")
-    })
+  const sql = "INSERT INTO Item (name, description) VALUES (?, ?)"
+  const item = [req.body.name, req.body.description]
+  db.run(sql, item, err => {
+    if (err) {
+      return res.send(err.message);
+    }
+    res.send("ok")
+  })
 })
 
 app.patch("/items", (req, res) => {
-    const sql = "UPDATE Item SET name = ?, description = ? where id = ?"
-    const item = [req.body.name, req.body.description, req.body.id]
-    db.run(sql, item, err=>{
-        if (err) {
-            return res.send(err.message);
-          }
-        res.send("ok")
-    })
+  const sql = "UPDATE Item SET name = ?, description = ? where id = ?"
+  const item = [req.body.name, req.body.description, req.body.id]
+  db.run(sql, item, err => {
+    if (err) {
+      return res.send(err.message);
+    }
+    res.send("ok")
+  })
 })
 
-app.delete("/items",(req, res) => {
-    const sql = "DELETE FROM Item WHERE id = ?";
-    const id = req.body.id
-    db.run(sql, id, err=>{
-        if (err) {
-            return res.send(err.message);
-          }
-        res.send("ok")
-    })
+app.delete("/items", (req, res) => {
+  const sql = "DELETE FROM Item WHERE id = ?";
+  const id = req.body.id
+  db.run(sql, id, err => {
+    if (err) {
+      return res.send(err.message);
+    }
+    res.send("ok")
+  })
 })
 
-app.get("/periods", (req,res)=>{
-    const sql = "SELECT * FROM Period;"
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-          return res.send(err.message);
-        }
-        res.send(rows)
-      });
+app.get("/periods", (req, res) => {
+  const sql = "SELECT * FROM Period;"
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      return res.send(err.message);
+    }
+    res.send(rows)
+  });
 })
 
 app.post("/periods", (req, res) => {
-    const sql = "INSERT INTO Period (name, description) VALUES (?, ?)"
-    const period = [req.body.name, req.body.description]
-    db.run(sql, period, err=>{
-        if (err) {
-            return res.send(err.message);
-          }
-        res.send("ok")
-    })
+  const sql = "INSERT INTO Period (name, description) VALUES (?, ?)"
+  const period = [req.body.name, req.body.description]
+  db.run(sql, period, err => {
+    if (err) {
+      return res.send(err.message);
+    }
+    res.send("ok")
+  })
 })
 
 app.patch("/periods", (req, res) => {
-    const sql = "UPDATE Period SET name = ?, description = ? where id = ?"
-    const period = [req.body.name, req.body.description, req.body.id]
-    db.run(sql, period, err=>{
-        if (err) {
-            return res.send(err.message);
-          }
-        res.send("ok")
-    })
+  const sql = "UPDATE Period SET name = ?, description = ? where id = ?"
+  const period = [req.body.name, req.body.description, req.body.id]
+  db.run(sql, period, err => {
+    if (err) {
+      return res.send(err.message);
+    }
+    res.send("ok")
+  })
 })
 
-app.delete("/periods",(req, res) => {
-    const sql = "DELETE FROM Period WHERE id = ?";
-    const id = req.body.id
-    db.run(sql, id, err=>{
-        if (err) {
-            return res.send(err.message);
-          }
-        res.send("ok")
-    })
+app.delete("/periods", (req, res) => {
+  const sql = "DELETE FROM Period WHERE id = ?";
+  const id = req.body.id
+  db.run(sql, id, err => {
+    if (err) {
+      return res.send(err.message);
+    }
+    res.send("ok")
+  })
+})
+
+app.get("/itemsperiods", (req, res) => {
+  const sql = "SELECT * FROM ItemsPeriods;"
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      return res.send(err.message);
+    }
+    res.send(rows)
+  });
+})
+app.get("/itemsperiodsinfo", (req, res) => {
+  const id = req.query.id
+  const sql = `SELECT 
+                ItemsPeriods.id,
+                ItemsPeriods.value,
+                Item.name AS item_name,
+                Period.name AS period_name,
+                Item.description AS item_description,
+                Period.description AS period_description
+              FROM ItemsPeriods 
+                LEFT JOIN Item ON ItemsPeriods.item_id=Item.id 
+                LEFT JOIN Period ON ItemsPeriods.period_id=Period.id 
+              WHERE ItemsPeriods.id = ? ;`
+  db.all(sql, id, (err, rows) => {
+    if (err) {
+      return res.send(err.message);
+    }
+    res.send(rows)
+  });
 })
