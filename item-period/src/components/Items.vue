@@ -25,6 +25,7 @@
             <v-text-field
               v-model="props.item.name"
               label="Edit"
+              hint="чтобы изменить, нажмите Enter"
               single-line
               counter
             ></v-text-field>
@@ -44,6 +45,7 @@
             <v-text-field
               v-model="props.item.description"
               label="Edit"
+              hint="чтобы изменить, нажмите Enter"
               single-line
               counter
             ></v-text-field>
@@ -52,7 +54,12 @@
       </template>
     </v-data-table>
 
-    <table-actions v-on:save="save" :canSave="canSave" :deleteItems="deleteItems" :saveAll="saveAll" ></table-actions>
+    <table-actions
+      v-on:save="save"
+      :canSave="canSave"
+      :deleteItems="deleteItems"
+      :saveAll="saveAll"
+    ></table-actions>
   </v-card>
 </template>
 
@@ -66,16 +73,17 @@ export default {
   created() {
     this.initialize();
   },
-  
+
   methods: {
-    dialogChange(){},
+    dialogChange() {},
     async initialize() {
       await ItemsService.getItems().then((items) => {
         (this.items = items), (this.isLoading = false);
       });
     },
-    
+
     async deleteItems() {
+      this.isLoading = true;
       for (let item of this.selected) {
         await ItemsService.deleteItem(item.id);
       }
@@ -88,14 +96,12 @@ export default {
     },
     closeInput() {},
     async save(editedItem) {
-      await ItemsService.addItem(
-        editedItem.name,
-        editedItem.description
-      );
+      this.isLoading = true;
+      await ItemsService.addItem(editedItem.name, editedItem.description);
       await this.initialize();
-
     },
     async saveAll() {
+      this.isLoading = true;
       for (let item of this.items) {
         await ItemsService.updateItem(item);
       }
@@ -106,9 +112,9 @@ export default {
   data: () => ({
     canSave: true,
     selected: [],
-    
+
     isLoading: true,
-    
+
     defaultItem: {
       id: 0,
       name: "",
